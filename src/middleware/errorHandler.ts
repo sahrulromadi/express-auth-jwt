@@ -1,11 +1,11 @@
 // file ini untuk menangani error secara global dengan cara middleware
 
-import { Response, Request, NextFunction } from "express";
+import { ErrorRequestHandler } from "express";
 import AppError from "../utils/AppError";
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR } from "../constants/http";
 import { ZodError } from "zod";
 
-const handleAppError = (err: AppError, res: Response) => {
+const handleAppError: ErrorRequestHandler = (err: AppError, req, res, next) => {
   res.status(err.statusCode).json({
     success: false,
     type: "App Error", // buat debugging
@@ -13,7 +13,7 @@ const handleAppError = (err: AppError, res: Response) => {
   });
 };
 
-const handleZodError = (err: ZodError, res: Response) => {
+const handleZodError: ErrorRequestHandler = (err: ZodError, req, res, next) => {
   const errors = err.errors.map((error) => {
     return {
       [error.path.join(".")]: error.message,
@@ -27,20 +27,15 @@ const handleZodError = (err: ZodError, res: Response) => {
   });
 };
 
-const errorHandler = (
-  err: Error,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   console.log(`path = ${req.path}`, `\nerror = ${err}`);
 
   if (err instanceof AppError) {
-    return handleAppError(err, res);
+    return handleAppError(err, req, res, next);
   }
 
   if (err instanceof ZodError) {
-    return handleZodError(err, res);
+    return handleZodError(err, req, res, next);
   }
 
   res.status(INTERNAL_SERVER_ERROR).json({
