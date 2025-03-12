@@ -3,7 +3,7 @@
 import { Response, Request, NextFunction } from "express";
 import AppError from "../utils/AppError";
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR } from "../constants/http";
-import { z, ZodError } from "zod";
+import { ZodError } from "zod";
 
 const handleAppError = (err: AppError, res: Response) => {
   res.status(err.statusCode).json({
@@ -13,7 +13,7 @@ const handleAppError = (err: AppError, res: Response) => {
   });
 };
 
-const handleZodError = (err: z.ZodError, res: Response) => {
+const handleZodError = (err: ZodError, res: Response) => {
   const errors = err.errors.map((error) => {
     return {
       [error.path.join(".")]: error.message,
