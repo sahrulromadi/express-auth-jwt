@@ -1,10 +1,15 @@
 // file ini berfungsi untuk mengecek apakah user sudah login atau belum dengan mengecek accessToken dari jwt
 
-import { RequestHandler } from "express";
+import { Request, RequestHandler } from "express";
 import { verifyAccessToken } from "../utils/jwt";
 import AppError from "../utils/AppError";
 
-const authenticate: RequestHandler = (req, res, next) => {
+// membuat interface untuk menambahkan userId ke dalam req yang bisa diakses dengan AuthRequest
+export interface AuthRequest extends Request {
+  userId?: number;
+}
+
+const authenticate: RequestHandler = (req: AuthRequest, res, next) => {
   const accessToken = req.headers.authorization?.split(" ")[1];
   if (!accessToken) throw new AppError(401, "unauthorized");
 

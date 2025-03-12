@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import { OK, CREATED } from "../constants/http";
 import { createAccount, loginUser } from "../services/auth.service";
 import { loginSchema, registerSchema } from "../validations/auth.schema";
+import { AuthRequest } from "../middleware/authenticate";
 
 /**
  * register
@@ -48,9 +49,16 @@ export const loginHandler: RequestHandler = async (req, res, next) => {
  * @route GET /api/v1/auth/test
  * @middleware authenticate
  */
-export const testHandler: RequestHandler = (req, res, next) => {
+export const testHandler: RequestHandler = (req: AuthRequest, res, next) => {
   try {
-    res.status(OK).send("berhasil masuk");
+    const userId = req.userId;
+
+    res.status(OK).json({
+      success: true,
+      data: {
+        userId,
+      },
+    });
   } catch (error) {
     next(error);
   }
